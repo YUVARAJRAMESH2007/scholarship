@@ -1,0 +1,14 @@
+[
+  {
+    "category": "Travel",
+    "amount": 12000
+  },
+  {
+    "category": "Food",
+    "amount": 8000
+  },
+  {
+    "category": "Utilities",
+    "amount": 5000
+  }
+]
