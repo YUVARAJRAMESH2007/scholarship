@@ -59,24 +59,45 @@
 #     def __str__(self):
 #         return f"{self.export_type} export at {self.exported_at} for {self.report_execution.report.name}"
 from django.db import models
-import uuid
 
-class ReportDefinition(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class ScholarshipProgram(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    query_json = models.JSONField(default=dict)  # Use JSON for query/config
-    created_by_uuid = models.UUIDField()
+    criteria = models.TextField(blank=True)
+
+class Student(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    student_id = models.CharField(max_length=100, unique=True)
+
+class ScholarshipApplication(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    program = models.ForeignKey(ScholarshipProgram, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, default='pending')
+    applied_on = models.DateField(auto_now_add=True)
+    approved_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+class ApplicationDocument(models.Model):
+    application = models.ForeignKey(ScholarshipApplication, on_delete=models.CASCADE)
+    doc_name = models.CharField(max_length=255)
+    doc_file_url = models.CharField(max_length=255)
+
+class Award(models.Model):
+    application = models.ForeignKey(ScholarshipApplication, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    award_date = models.DateField(auto_now_add=True)
+
+class ReportDefinition(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    query_json = models.JSONField(default=dict)
+    created_by_id = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.name
-
 class ReportExecution(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    report_uuid = models.UUIDField()  # Link by UUID only
-    executed_by_uuid = models.UUIDField()
+    report = models.ForeignKey(ReportDefinition, on_delete=models.CASCADE)
+    executed_by_id = models.IntegerField()
     executed_at = models.DateTimeField(auto_now_add=True)
     parameters_json = models.JSONField(default=dict)
     result_json = models.JSONField(default=dict)
@@ -84,25 +105,17 @@ class ReportExecution(models.Model):
     error_message = models.TextField(blank=True, null=True)
     execution_time_ms = models.IntegerField(null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.report_uuid} executed at {self.executed_at}"
-
 class Dashboard(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    owner_uuid = models.UUIDField()
-    is_shared = models.BooleanField(default=False)  # <-- ADD THIS
-    shared_with_uuids = models.JSONField(default=list, blank=True)  
+    owner_id = models.IntegerField()
+    is_shared = models.BooleanField(default=False)
+    shared_with_ids = models.JSONField(default=list, blank=True)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.name
-
 class Widget(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    dashboard_uuid = models.UUIDField()  # Link by UUID only
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     widget_type = models.CharField(max_length=50)
     config_json = models.JSONField(default=dict)
@@ -113,11 +126,7 @@ class Widget(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"{self.title} ({self.widget_type})"
-
 class KPIStore(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     metric_name = models.CharField(max_length=255)
     metric_value = models.DecimalField(max_digits=15, decimal_places=2)
     metric_date = models.DateField()
@@ -125,19 +134,12 @@ class KPIStore(models.Model):
     metadata_json = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.metric_name}: {self.metric_value} ({self.metric_date})"
-
 class ExportLog(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    report_uuid = models.UUIDField()
+    report_execution = models.ForeignKey(ReportExecution, on_delete=models.CASCADE)
     export_type = models.CharField(max_length=10)
-    exported_by_uuid = models.UUIDField()
+    exported_by_id = models.IntegerField()
     file_path = models.CharField(max_length=255)
     file_size_bytes = models.BigIntegerField(null=True, blank=True)
     exported_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.export_type} export at {self.exported_at}"

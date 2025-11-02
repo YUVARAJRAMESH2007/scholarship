@@ -34,11 +34,19 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
+    ScholarshipProgramViewSet, StudentViewSet, ScholarshipApplicationViewSet,
+    ApplicationDocumentViewSet, AwardViewSet,
     ReportDefinitionViewSet, ReportExecutionViewSet,
-    DashboardViewSet, WidgetViewSet, KPIStoreViewSet, ExportLogViewSet,exportlog_pdf
+    DashboardViewSet, WidgetViewSet, KPIStoreViewSet, ExportLogViewSet,
+    exportlog_pdf
 )
 
 router = DefaultRouter()
+router.register(r'programs', ScholarshipProgramViewSet, basename='program')
+router.register(r'students', StudentViewSet, basename='student')
+router.register(r'applications', ScholarshipApplicationViewSet, basename='application')
+router.register(r'documents', ApplicationDocumentViewSet, basename='document')
+router.register(r'awards', AwardViewSet, basename='award')
 router.register(r'reports', ReportDefinitionViewSet, basename='report')
 router.register(r'executions', ReportExecutionViewSet, basename='execution')
 router.register(r'dashboards', DashboardViewSet, basename='dashboard')
@@ -46,12 +54,10 @@ router.register(r'widgets', WidgetViewSet, basename='widget')
 router.register(r'kpis', KPIStoreViewSet, basename='kpi')
 router.register(r'exports', ExportLogViewSet, basename='export')
 
+
 urlpatterns = [
     path('', include(router.urls)),
-    
-
-
-    path('exports/<uuid:uuid>/pdf/', exportlog_pdf, name='exportlog-pdf'),
-    path('', include(router.urls)),
+    path('exports/<int:pk>/pdf/', exportlog_pdf, name='exportlog-pdf')
 ]
+
 
