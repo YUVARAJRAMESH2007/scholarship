@@ -59,17 +59,20 @@
 #     def __str__(self):
 #         return f"{self.export_type} export at {self.exported_at} for {self.report_execution.report.name}"
 from django.db import models
+from django.contrib.auth.models import User
 
 class ScholarshipProgram(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    criteria = models.TextField(blank=True)
+    criteria1= models.TextField(blank=True)
+    criteria2= models.TextField(blank=True)
 
 class Student(models.Model):
+    # Linked Student profile to a unique User account for secure authentication
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile', null=True, blank=True)
     name = models.CharField(max_length=255)
     email = models.EmailField()
     student_id = models.CharField(max_length=100, unique=True)
-
 class ScholarshipApplication(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     program = models.ForeignKey(ScholarshipProgram, on_delete=models.CASCADE)

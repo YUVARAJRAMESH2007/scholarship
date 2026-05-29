@@ -1,0 +1,14 @@
+[
+  {
+    "program_id": 1,
+    "program_name": "merit scholarship",
+    "total_applications": 1,
+    "total_amount": 50000.0
+  },
+  {
+    "program_id": 2,
+    "program_name": "nsp scholarship",
+    "total_applications": 1,
+    "total_amount": 50000.0
+  }
+]

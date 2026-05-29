@@ -38,7 +38,7 @@ from .views import (
     ApplicationDocumentViewSet, AwardViewSet,
     ReportDefinitionViewSet, ReportExecutionViewSet,
     DashboardViewSet, WidgetViewSet, KPIStoreViewSet, ExportLogViewSet,
-    exportlog_pdf
+    exportlog_pdf, RegisterView, LoginView # Imported the new authentication views here
 )
 
 router = DefaultRouter()
@@ -54,10 +54,9 @@ router.register(r'widgets', WidgetViewSet, basename='widget')
 router.register(r'kpis', KPIStoreViewSet, basename='kpi')
 router.register(r'exports', ExportLogViewSet, basename='export')
 
-
 urlpatterns = [
     path('', include(router.urls)),
-    path('exports/<int:pk>/pdf/', exportlog_pdf, name='exportlog-pdf')
+    path('exports/<int:pk>/pdf/', exportlog_pdf, name='exportlog-pdf'),
+    path('auth/register/', RegisterView.as_view(), name='register'), # Authentication registration endpoint
+    path('auth/login/', LoginView.as_view(), name='login'),          # Authentication login endpoint
 ]
-
-

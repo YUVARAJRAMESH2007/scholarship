@@ -82,3 +82,38 @@ class ExportRequestSerializer(serializers.Serializer):
     export_type = serializers.ChoiceField(choices=['CSV', 'PDF', 'XLSX', 'JSON'])
     exported_by_id = serializers.IntegerField()
     parameters_json = serializers.JSONField(default=dict, required=False)
+from django.contrib.auth.models import User
+
+class RegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, required=True)
+    password = serializers.CharField(max_length=128, write_only=True, required=True)
+    email = serializers.EmailField(required=True)
+    name = serializers.CharField(max_length=255, required=True)
+    student_id = serializers.CharField(max_length=100, required=True)
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("This username is already taken.")
+        return value
+
+    def validate_student_id(self, value):
+        if Student.objects.filter(student_id=value).exists():
+            raise serializers.ValidationError("This Student ID is already registered.")
+        return value
+
+    def create(self, validated_data):
+        # Create a secure default user credentials instance
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+        
+        # Formulate and link the related profile tracking data
+        Student.objects.create(
+            user=user,
+            name=validated_data['name'],
+            email=validated_data['email'],
+            student_id=validated_data['student_id']
+        )
+        return user

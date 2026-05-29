@@ -1,419 +1,4 @@
-# from django.http import JsonResponse
-# from django.views.decorators.csrf import csrf_exempt
-# import json
-# from .models import ReportDefinition, ReportExecution, Dashboard, Widget, KPIStore, ExportLog
-
-# # ReportDefinition APIs
-# @csrf_exempt
-# def report_definition_list(request):
-#     if request.method == 'GET':
-#         reports = ReportDefinition.objects.all()
-#         data = [
-#             {
-#                 "id": r.id,
-#                 "name": r.name,
-#                 "description": r.description,
-#                 "filters": r.filters,
-#                 "query": r.query,
-#                 "created_at": r.created_at.isoformat()
-#             } for r in reports
-#         ]
-#         return JsonResponse(data, safe=False)
-#     elif request.method == 'POST':
-#         body = json.loads(request.body.decode('utf-8'))
-#         report = ReportDefinition.objects.create(
-#             name=body.get('name'),
-#             description=body.get('description', ''),
-#             filters=body.get('filters', ''),
-#             query=body.get('query', '')
-#         )
-#         return JsonResponse({
-#             "id": report.id,
-#             "name": report.name,
-#             "description": report.description,
-#             "filters": report.filters,
-#             "query": report.query,
-#             "created_at": report.created_at.isoformat()
-#         }, status=201)
-
-
-
-
-# @csrf_exempt
-# def report_definition_detail(request, pk):
-#     try:
-#         report = ReportDefinition.objects.get(pk=pk)
-#     except ReportDefinition.DoesNotExist:
-#         return JsonResponse({'error': 'Not found'}, status=404)
-
-#     if request.method == 'GET':
-#         data = {
-#             "id": report.id,
-#             "name": report.name,
-#             "description": report.description,
-#             "filters": report.filters,
-#             "query": report.query,
-#             "created_at": report.created_at.isoformat()
-#         }
-#         return JsonResponse(data)
-
-#     elif request.method == 'PUT':
-#         try:
-#             print(request.body)  # Debug: View in terminal what Postman sends
-#             body = json.loads(request.body.decode('utf-8'))
-#             report.name = body.get('name', report.name)
-#             report.description = body.get('description', report.description)
-#             report.filters = body.get('filters', report.filters)
-#             report.query = body.get('query', report.query)
-#             report.save()
-#             return JsonResponse({
-#                 "id": report.id,
-#                 "name": report.name,
-#                 "description": report.description,
-#                 "filters": report.filters,
-#                 "query": report.query,
-#                 "created_at": report.created_at.isoformat()
-#             })
-#         except Exception as e:
-#             return JsonResponse({'error': str(e)}, status=400)
-
-#     elif request.method == 'DELETE':
-#         report.delete()
-#         return JsonResponse({'message': 'Deleted'}, status=204)
-#     else:
-#         return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-
-# # ReportExecution APIs
-# @csrf_exempt
-# def report_execution_list(request):
-#     if request.method == 'GET':
-#         executions = ReportExecution.objects.all()
-#         data = [
-#             {
-#                 "id": e.id,
-#                 "report_id": e.report.id,
-#                 "executed_at": e.executed_at.isoformat(),
-#                 "status": e.status,
-#                 "result": e.result
-#             } for e in executions
-#         ]
-#         return JsonResponse(data, safe=False)
-#     elif request.method == 'POST':
-#         body = json.loads(request.body.decode('utf-8'))
-#         report = ReportDefinition.objects.get(pk=body.get('report_id'))
-#         execution = ReportExecution.objects.create(
-#             report=report,
-#             status=body.get('status', 'Pending'),
-#             result=body.get('result', '')
-#         )
-#         return JsonResponse({
-#             "id": execution.id,
-#             "report_id": execution.report.id,
-#             "executed_at": execution.executed_at.isoformat(),
-#             "status": execution.status,
-#             "result": execution.result
-#         }, status=201)
-
-# @csrf_exempt
-# def report_execution_detail(request, pk):
-#     try:
-#         execution = ReportExecution.objects.get(pk=pk)
-#     except ReportExecution.DoesNotExist:
-#         return JsonResponse({'error': 'Not found'}, status=404)
-
-#     if request.method == 'GET':
-#         data = {
-#             "id": execution.id,
-#             "report_id": execution.report.id,
-#             "executed_at": execution.executed_at.isoformat(),
-#             "status": execution.status,
-#             "result": execution.result
-#         }
-#         return JsonResponse(data)
-#     elif request.method == 'PUT':
-#         body = json.loads(request.body.decode('utf-8'))
-#         execution.status = body.get('status', execution.status)
-#         execution.result = body.get('result', execution.result)
-#         execution.save()
-#         return JsonResponse({
-#             "id": execution.id,
-#             "report_id": execution.report.id,
-#             "executed_at": execution.executed_at.isoformat(),
-#             "status": execution.status,
-#             "result": execution.result
-#         })
-#     elif request.method == 'DELETE':
-#         execution.delete()
-#         return JsonResponse({'message': 'Deleted'}, status=204)
-
-
-# # Dashboard APIs
-# @csrf_exempt
-# def dashboard_list(request):
-#     if request.method == 'GET':
-#         dashboards = Dashboard.objects.all()
-#         data = [
-#             {
-#                 "id": d.id,
-#                 "name": d.name,
-#                 "description": d.description,
-#                 "created_at": d.created_at.isoformat()
-#             } for d in dashboards
-#         ]
-#         return JsonResponse(data, safe=False)
-#     elif request.method == 'POST':
-#         body = json.loads(request.body.decode('utf-8'))
-#         dashboard = Dashboard.objects.create(
-#             name=body.get('name'),
-#             description=body.get('description', '')
-#         )
-#         return JsonResponse({
-#             "id": dashboard.id,
-#             "name": dashboard.name,
-#             "description": dashboard.description,
-#             "created_at": dashboard.created_at.isoformat()
-#         }, status=201)
-
-# @csrf_exempt
-# def dashboard_detail(request, pk):
-#     try:
-#         dashboard = Dashboard.objects.get(pk=pk)
-#     except Dashboard.DoesNotExist:
-#         return JsonResponse({'error': 'Not found'}, status=404)
-
-#     if request.method == 'GET':
-#         data = {
-#             "id": dashboard.id,
-#             "name": dashboard.name,
-#             "description": dashboard.description,
-#             "created_at": dashboard.created_at.isoformat()
-#         }
-#         return JsonResponse(data)
-#     elif request.method == 'PUT':
-#         body = json.loads(request.body.decode('utf-8'))
-#         dashboard.name = body.get('name', dashboard.name)
-#         dashboard.description = body.get('description', dashboard.description)
-#         dashboard.save()
-#         return JsonResponse({
-#             "id": dashboard.id,
-#             "name": dashboard.name,
-#             "description": dashboard.description,
-#             "created_at": dashboard.created_at.isoformat()
-#         })
-#     elif request.method == 'DELETE':
-#         dashboard.delete()
-#         return JsonResponse({'message': 'Deleted'}, status=204)
-
-
-# # Widget APIs
-# @csrf_exempt
-# def widget_list(request):
-#     if request.method == 'GET':
-#         widgets = Widget.objects.all()
-#         data = [
-#             {
-#                 "id": w.id,
-#                 "dashboard_id": w.dashboard.id,
-#                 "title": w.title,
-#                 "widget_type": w.widget_type,
-#                 "config": w.config
-#             } for w in widgets
-#         ]
-#         return JsonResponse(data, safe=False)
-#     elif request.method == 'POST':
-#         body = json.loads(request.body.decode('utf-8'))
-#         dashboard = Dashboard.objects.get(pk=body.get('dashboard_id'))
-#         widget = Widget.objects.create(
-#             dashboard=dashboard,
-#             title=body.get('title'),
-#             widget_type=body.get('widget_type'),
-#             config=body.get('config', '')
-#         )
-#         return JsonResponse({
-#             "id": widget.id,
-#             "dashboard_id": widget.dashboard.id,
-#             "title": widget.title,
-#             "widget_type": widget.widget_type,
-#             "config": widget.config
-#         }, status=201)
-
-# @csrf_exempt
-# def widget_detail(request, pk):
-#     try:
-#         widget = Widget.objects.get(pk=pk)
-#     except Widget.DoesNotExist:
-#         return JsonResponse({'error': 'Not found'}, status=404)
-
-#     if request.method == 'GET':
-#         data = {
-#             "id": widget.id,
-#             "dashboard_id": widget.dashboard.id,
-#             "title": widget.title,
-#             "widget_type": widget.widget_type,
-#             "config": widget.config
-#         }
-#         return JsonResponse(data)
-#     elif request.method == 'PUT':
-#         body = json.loads(request.body.decode('utf-8'))
-#         widget.title = body.get('title', widget.title)
-#         widget.widget_type = body.get('widget_type', widget.widget_type)
-#         widget.config = body.get('config', widget.config)
-#         widget.save()
-#         return JsonResponse({
-#             "id": widget.id,
-#             "dashboard_id": widget.dashboard.id,
-#             "title": widget.title,
-#             "widget_type": widget.widget_type,
-#             "config": widget.config
-#         })
-#     elif request.method == 'DELETE':
-#         widget.delete()
-#         return JsonResponse({'message': 'Deleted'}, status=204)
-
-
-# # KPIStore APIs
-# @csrf_exempt
-# def kpi_store_list(request):
-#     if request.method == 'GET':
-#         kpis = KPIStore.objects.all()
-#         data = [
-#             {
-#                 "id": k.id,
-#                 "kpi_name": k.kpi_name,
-#                 "kpi_value": k.kpi_value,
-#                 "timestamp": k.timestamp.isoformat()
-#             } for k in kpis
-#         ]
-#         return JsonResponse(data, safe=False)
-#     elif request.method == 'POST':
-#         body = json.loads(request.body.decode('utf-8'))
-#         kpi = KPIStore.objects.create(
-#             kpi_name=body.get('kpi_name'),
-#             kpi_value=body.get('kpi_value')
-#         )
-#         return JsonResponse({
-#             "id": kpi.id,
-#             "kpi_name": kpi.kpi_name,
-#             "kpi_value": kpi.kpi_value,
-#             "timestamp": kpi.timestamp.isoformat()
-#         }, status=201)
-
-# @csrf_exempt
-# def kpi_store_detail(request, pk):
-#     try:
-#         kpi = KPIStore.objects.get(pk=pk)
-#     except KPIStore.DoesNotExist:
-#         return JsonResponse({'error': 'Not found'}, status=404)
-
-#     if request.method == 'GET':
-#         data = {
-#             "id": kpi.id,
-#             "kpi_name": kpi.kpi_name,
-#             "kpi_value": kpi.kpi_value,
-#             "timestamp": kpi.timestamp.isoformat()
-#         }
-#         return JsonResponse(data)
-#     elif request.method == 'PUT':
-#         body = json.loads(request.body.decode('utf-8'))
-#         kpi.kpi_name = body.get('kpi_name', kpi.kpi_name)
-#         kpi.kpi_value = body.get('kpi_value', kpi.kpi_value)
-#         kpi.save()
-#         return JsonResponse({
-#             "id": kpi.id,
-#             "kpi_name": kpi.kpi_name,
-#             "kpi_value": kpi.kpi_value,
-#             "timestamp": kpi.timestamp.isoformat()
-#         })
-#     elif request.method == 'DELETE':
-#         kpi.delete()
-#         return JsonResponse({'message': 'Deleted'}, status=204)
-
-
-# # ExportLog APIs
-# @csrf_exempt
-# def export_log_list(request):
-#     if request.method == 'GET':
-#         exports = ExportLog.objects.all()
-#         data = [
-#             {
-#                 "id": e.id,
-#                 "report_execution_id": e.report_execution.id,
-#                 "export_type": e.export_type,
-#                 "exported_at": e.exported_at.isoformat(),
-#                 "exported_by": e.exported_by
-#             } for e in exports
-#         ]
-#         return JsonResponse(data, safe=False)
-#     elif request.method == 'POST':
-#         body = json.loads(request.body.decode('utf-8'))
-#         exec_obj = ReportExecution.objects.get(pk=body.get('report_execution_id'))
-#         export = ExportLog.objects.create(
-#             report_execution=exec_obj,
-#             export_type=body.get('export_type'),
-#             exported_by=body.get('exported_by')
-#         )
-#         return JsonResponse({
-#             "id": export.id,
-#             "report_execution_id": export.report_execution.id,
-#             "export_type": export.export_type,
-#             "exported_at": export.exported_at.isoformat(),
-#             "exported_by": export.exported_by
-#         }, status=201)
-
-# @csrf_exempt
-# def export_log_detail(request, pk):
-#     try:
-#         export = ExportLog.objects.get(pk=pk)
-#     except ExportLog.DoesNotExist:
-#         return JsonResponse({'error': 'Not found'}, status=404)
-
-#     if request.method == 'GET':
-#         data = {
-#             "id": export.id,
-#             "report_execution_id": export.report_execution.id,
-#             "export_type": export.export_type,
-#             "exported_at": export.exported_at.isoformat(),
-#             "exported_by": export.exported_by
-#         }
-#         return JsonResponse(data)
-#     elif request.method == 'PUT':
-#         body = json.loads(request.body.decode('utf-8'))
-#         export.export_type = body.get('export_type', export.export_type)
-#         export.exported_by = body.get('exported_by', export.exported_by)
-#         export.save()
-#         return JsonResponse({
-#             "id": export.id,
-#             "report_execution_id": export.report_execution.id,
-#             "export_type": export.export_type,
-#             "exported_at": export.exported_at.isoformat(),
-#             "exported_by": export.exported_by
-#         })
-#     elif request.method == 'DELETE':
-#         export.delete()
-#         return JsonResponse({'message': 'Deleted'}, status=204)
-# from io import BytesIO
-# from reportlab.pdfgen import canvas
-# from django.http import HttpResponse
-
-# def exportlog_pdf(request, pk):
-#     try:
-#         export = ExportLog.objects.get(pk=pk)
-#     except ExportLog.DoesNotExist:
-#         return HttpResponse('ExportLog not found', status=404)
-
-#     buffer = BytesIO()
-#     p = canvas.Canvas(buffer)
-#     p.drawString(100, 800, f"Export Log ID: {export.id}")
-#     p.drawString(100, 780, f"Report Execution ID: {export.report_execution.id}")
-#     p.drawString(100, 760, f"Export Type: {export.export_type}")
-#     p.drawString(100, 740, f"Exported At: {export.exported_at}")
-#     p.drawString(100, 720, f"Exported By: {export.exported_by}")
-#     p.showPage()
-#     p.save()
-
-#     buffer.seek(0)
-#     return HttpResponse(buffer, content_type='application/pdf')
+#
 import time
 import csv
 import json
@@ -663,3 +248,77 @@ def exportlog_pdf(request, pk=None):
     p.save()
     buffer.seek(0)
     return HttpResponse(buffer, content_type='application/pdf')
+from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+from .serializers import RegisterSerializer
+
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, created = Token.objects.get_or_create(user=user)
+            
+            # Fetch the linked student profile ID that was just created
+            student_profile_id = None
+            if hasattr(user, 'student_profile'):
+                student_profile_id = user.student_profile.id
+
+            return Response({
+                "message": "Registration completed successfully",
+                "token": token.key,
+                "role": "student",
+                "username": user.username,                         # NEW: Send username back
+                "student_profile_id": student_profile_id           # NEW: Send student ID back
+            }, status=status.HTTP_201_CREATED)
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response({"error": "Username and password fields are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Authenticate details against Django auth subsystem
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            
+            # Identify access role permissions tier
+            role = "student"
+            if user.is_superuser or user.is_staff:
+                role = "admin"
+
+            # Gather internal profile database ID reference context for a student account
+            student_profile_id = None
+            if hasattr(user, 'student_profile'):
+                student_profile_id = user.student_profile.id
+
+            return Response({
+                "token": token.key,
+                "role": role,
+                "username": user.username,
+                "student_profile_id": student_profile_id
+            }, status=status.HTTP_200_OK)
+        
+        return Response({"error": "Invalid authentication credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+# Find your existing StudentViewSet and replace it with this:
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+    # Override the delete method to remove the core User account as well
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # If the student has a linked login account, delete the account (which cascades and deletes the student profile)
+        if instance.user:
+            instance.user.delete()
+        else:
+            # If no login account exists, just delete the profile
+            instance.delete()
+        return Response({"message": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)

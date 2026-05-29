@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply bg-[#050505] text-[#f3f4f6] m-0 antialiased overflow-x-hidden;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+/* Custom Scrollbar for a premium gamer feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* --- High-Level RGB Animations --- */
+
+@keyframes rgb-border {
+  0% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000, inset 0 0 10px #ff0000; }
+  25% { border-color: #00ff00; box-shadow: 0 0 15px #00ff00, inset 0 0 10px #00ff00; }
+  50% { border-color: #0000ff; box-shadow: 0 0 15px #0000ff, inset 0 0 10px #0000ff; }
+  75% { border-color: #ff00ff; box-shadow: 0 0 15px #ff00ff, inset 0 0 10px #ff00ff; }
+  100% { border-color: #ff0000; box-shadow: 0 0 15px #ff0000, inset 0 0 10px #ff0000; }
+}
+
+@keyframes rgb-text {
+  0% { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
+  33% { color: #00ffaa; text-shadow: 0 0 10px #00ffaa; }
+  66% { color: #5500ff; text-shadow: 0 0 10px #5500ff; }
+  100% { color: #ff0055; text-shadow: 0 0 10px #ff0055; }
+}
+
+@keyframes rgb-bg-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes matrix-fall {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.animate-rgb-border {
+  animation: rgb-border 4s linear infinite;
+  border: 2px solid transparent;
+}
+
+.animate-rgb-text {
+  animation: rgb-text 5s linear infinite;
+}
+
+.rgb-gradient-bg {
+  background: linear-gradient(45deg, #12002b, #001f3f, #1a001a, #001220);
+  background-size: 400% 400%;
+  animation: rgb-bg-shift 15s ease infinite;
+}
+
+.glass-card {
+  background: rgba(10, 10, 15, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.input-rgb-focus:focus {
+  animation: rgb-border 3s linear infinite;
+  outline: none;
+}
